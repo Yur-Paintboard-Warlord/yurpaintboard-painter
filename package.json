@@ -1,0 +1,10 @@
+{
+  "name": "yurpaintboard-painter",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Script for yur paintboard",
+  "main": "main.js",
+  "dependencies": {
+    "ws": "^8.12.0"
+  }
+}
