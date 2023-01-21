@@ -1,10 +1,10 @@
 const WebSocket = require('ws');
 const ZSTDDecoder = require("./zstd.js");
 const WS_URL = "wss://paint.d0j1a1701.cc/api/ws"; // ws url
-const Data = require("./data"); // »­µÄÄÚÈÝ£¬[600][1000]£¨Ïê¼û readme£©
+const Data = require("./data"); // ç”»çš„å†…å®¹ï¼Œ[600][1000]ï¼ˆè¯¦è§ readmeï¼‰
 const fs = require('fs');
 
-const mode = 1; // 1 Î¬»¤ 2 ±£»¤ 3 µ÷ÊÔ£¨Ïê¼û readme£©
+const mode = 1; // 1 ç»´æŠ¤ 2 ä¿æŠ¤ 3 è°ƒè¯•ï¼ˆè¯¦è§ readmeï¼‰
 
 fs.readFile('./tokens.txt', (err, data) => {
   if (err) {
@@ -28,29 +28,29 @@ fs.readFile('./tokens.txt', (err, data) => {
     console.log("[INFO] try create ws(%s).", tokens[i].substring(0, 6));
     createWs(tokens[i], false);
   }
-  setInterval(maintain, 508); // Ñ¡Ôñ±£»¤Ñ¡ÏîÊ±¿ÉÒÔÊÊµ±µ÷Ð¡
+  setInterval(maintain, 508); // é€‰æ‹©ä¿æŠ¤é€‰é¡¹æ—¶å¯ä»¥é€‚å½“è°ƒå°
 });
 
 const W = 1000;
 const H = 600;
-let wsList = []; // ¿ÉÓÃ ws ÁÐ±í
+let wsList = []; // å¯ç”¨ ws åˆ—è¡¨
 
-const board = Array.from(Array(H), () => new Array(W)); // »æ°æ×´Ì¬£¬²»ÒªÓÃ³ýÁË update ºÍ updateraw µÄ·½Ê½ÐÞ¸Ä¡£
+const board = Array.from(Array(H), () => new Array(W)); // ç»˜ç‰ˆçŠ¶æ€ï¼Œä¸è¦ç”¨é™¤äº† update å’Œ updateraw çš„æ–¹å¼ä¿®æ”¹ã€‚
 
-const inq = Array.from(Array(H), () => new Array(W)); // ÊÇ·ñÔÚÎ¬»¤¶ÓÁÐÀïÃæ£¬·ÀÖ¹¶à´ÎÈë¶Ó
-const wait = Array.from(Array(H), () => new Array(W)); // ÊÇ·ñÔÚµÈ ws ¸üÐÂ×Ô¼ºµÄ»­Í¼Ö¸Áî£¬·ÀÖ¹µ÷¶¯Èë¶Ó
-const justt = Array.from(Array(H), () => new Array(W)); // ÊÇ·ñ¸Õ¸Õ¸üÐÂ¹ý£¬·ÀÖ¹ÑÓ³ÙÔÙ´ÎÉ¨µ½×Ô¼º
-// ÒÔÉÏÈý¸öÊý×éÓÃÓÚÔö¼ÓÎ¬»¤Ð§ÂÊ¡£
+const inq = Array.from(Array(H), () => new Array(W)); // æ˜¯å¦åœ¨ç»´æŠ¤é˜Ÿåˆ—é‡Œé¢ï¼Œé˜²æ­¢å¤šæ¬¡å…¥é˜Ÿ
+const wait = Array.from(Array(H), () => new Array(W)); // æ˜¯å¦åœ¨ç­‰ ws æ›´æ–°è‡ªå·±çš„ç”»å›¾æŒ‡ä»¤ï¼Œé˜²æ­¢è°ƒåŠ¨å…¥é˜Ÿ
+const justt = Array.from(Array(H), () => new Array(W)); // æ˜¯å¦åˆšåˆšæ›´æ–°è¿‡ï¼Œé˜²æ­¢å»¶è¿Ÿå†æ¬¡æ‰«åˆ°è‡ªå·±
+// ä»¥ä¸Šä¸‰ä¸ªæ•°ç»„ç”¨äºŽå¢žåŠ ç»´æŠ¤æ•ˆçŽ‡ã€‚
 
 function coloreq(a, b) {
-  // b ´æ·ÅµÄÊÇ Data ÖÐµÄÖµ£¬Ö»ÓÐ b ÖÐÓÐÍ¸Ã÷É«²Å»á¿´×÷Í¸Ã÷¡£
+  // b å­˜æ”¾çš„æ˜¯ Data ä¸­çš„å€¼ï¼Œåªæœ‰ b ä¸­æœ‰é€æ˜Žè‰²æ‰ä¼šçœ‹ä½œé€æ˜Žã€‚
   if (b[0] == 11 && b[1] == 45 && b[2] == 14) return true;
   return a[0] == b[0] && a[1] == b[1] && a[2] == b[2];
 }
 
 function update(a) {
   if (mode == 3) console.log("[INFO] update ", a, " -> ", Data[a.y][a.x]);
-  mypush([a.y, a.x]); // ÐèÒª¸üÐÂ
+  mypush([a.y, a.x]); // éœ€è¦æ›´æ–°
   updateraw(a);
 }
 
@@ -58,10 +58,10 @@ function updateraw(a) {
   board[a.y][a.x] = a.c;
 }
 
-let allOk = false; // ÊÇ·ñÔØÈëÁË°æÃæ
+let allOk = false; // æ˜¯å¦è½½å…¥äº†ç‰ˆé¢
 
 function createWs(token, isMain) {
-  // isMain£ºÊÇ·ñÊÇÖ÷ token¡£
+  // isMainï¼šæ˜¯å¦æ˜¯ä¸» tokenã€‚
   let ws = null, open = false;
   try {
     ws = new WebSocket(WS_URL);
@@ -86,17 +86,17 @@ function createWs(token, isMain) {
       const raw_data = new Uint8Array(event.data);
       const [type, data] = [raw_data[0], raw_data.slice(1)];
       switch (type) {
-        case 0xfc: { // ÑéÖ¤³É¹¦
+        case 0xfc: { // éªŒè¯æˆåŠŸ
           console.log("[INFO] main token (%s) success", token.substring(0, 6));
           ws.send(new Uint8Array([0xf9]));
           wsList.push(ws)
           break;
         }
-        case 0xfd: { // ÑéÖ¤Ê§°Ü
+        case 0xfd: { // éªŒè¯å¤±è´¥
           console.log("[INFO] main token (%s) dead");
           break;
         }
-        case 0xfb: { // »ñµÃ°æÃæ£¬ÕâÀïÊ¹ÓÃ update »áµ¼ÖÂÎÞÓÃÈë¶Ó
+        case 0xfb: { // èŽ·å¾—ç‰ˆé¢ï¼Œè¿™é‡Œä½¿ç”¨ update ä¼šå¯¼è‡´æ— ç”¨å…¥é˜Ÿ
           const decoder = new ZSTDDecoder();
           decoder.init()
             .then(() => {
@@ -117,7 +117,7 @@ function createWs(token, isMain) {
             });
           break;
         }
-        case 0xfa: { // ¸üÐÂ²¢ÅÐ¶ÏÈë¶Ó
+        case 0xfa: { // æ›´æ–°å¹¶åˆ¤æ–­å…¥é˜Ÿ
           for (let i = 0; i < data.length; i += 7) {
             const x = data[i + 1] * 256 + data[i];
             const y = data[i + 3] * 256 + data[i + 2];
@@ -142,12 +142,12 @@ function createWs(token, isMain) {
       const raw_data = new Uint8Array(event.data);
       const [type, data] = [raw_data[0], raw_data.slice(1)];
       switch (type) {
-        case 0xfc: { // ÑéÖ¤³É¹¦
+        case 0xfc: { // éªŒè¯æˆåŠŸ
           console.log("[INFO] token(%s) success", token.substring(0, 6));
           wsList.push(ws)
           break;
         }
-        case 0xfc: { // ÑéÖ¤Ê§°Ü
+        case 0xfc: { // éªŒè¯å¤±è´¥
           console.log("[INFO] token(%s) dead");
           wsList.push(ws)
           break;
@@ -161,13 +161,13 @@ function createWs(token, isMain) {
 }
 
 function mypush(x) {
-  // Èë¶Ó
+  // å…¥é˜Ÿ
   if (inq[x[0]][x[1]]) return;
   mqueue.push(x);
   inq[x[0]][x[1]] = 1;
 }
 function mypop() {
-  // ³ö¶Ó
+  // å‡ºé˜Ÿ
   let ret = mqueue.shift();
   inq[ret[0]][ret[1]] = 0;
   return ret;
@@ -177,14 +177,14 @@ let mqueue = [];
 
 let nowplc = 0;
 function getws() {
-  // »ñµÃÏÂÒ»¸ö token¡£ÂÖ»»Ê¹ÓÃ token¡£
+  // èŽ·å¾—ä¸‹ä¸€ä¸ª tokenã€‚è½®æ¢ä½¿ç”¨ tokenã€‚
   let ret = wsList[nowplc];
   nowplc = (nowplc + 1) % wsList.length;
   return ret;
 }
 
 function maintainq() {
-  // Î¬»¤¶ÓÁÐÀïÃæÁÐ±í£¬×î¶à token ¸öÊý´Î¡£
+  // ç»´æŠ¤é˜Ÿåˆ—é‡Œé¢åˆ—è¡¨ï¼Œæœ€å¤š token ä¸ªæ•°æ¬¡ã€‚
   let x = 0;
   while (++x <= wsList.length && mqueue.length) {
     let s = mypop();
@@ -204,11 +204,11 @@ function maintain() {
     return;
   }
   if (wsList.length == 0) return;
-  const blocksize = 25; // ¿é³¤
+  const blocksize = 25; // å—é•¿
   for (let i = 0; i < blocksize; ++i) {
     for (let k = 0; k < W; ++k) {
       for (let j = i; j < H; j += blocksize) {
-        // ·Ö¿éÎ¬»¤£¨Ïê¼û readme£©
+        // åˆ†å—ç»´æŠ¤ï¼ˆè¯¦è§ readmeï¼‰
         if (!coloreq(board[j][k], Data[j][k])) {
           if (justt[j][k]) {
             justt[j][k] = 0;
@@ -229,7 +229,7 @@ function maintain() {
   maintainq();
 }
 
-function change(ws, x, y, c) {
+async function change(ws, x, y, c) {
   if (!allOk) {
     return;
   }
