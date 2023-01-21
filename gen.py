@@ -10,7 +10,7 @@ prior = []
 for i in range(0, 600):
   prior.append([])
   for j in range(0, 1000):
-    prior[i].append([11, 45, 14])
+    prior[i].append(0)
 cnt = 0
 def addpaint(img_path, cc):
   global cnt
