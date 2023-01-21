@@ -2,6 +2,7 @@ const WebSocket = require('ws');
 const ZSTDDecoder = require("./zstd.js");
 const WS_URL = "wss://paint.d0j1a1701.cc/api/ws"; // ws url
 const Data = require("./data"); // 画的内容，[600][1000]（详见 readme）
+const Prior = require("./prior"); // 优先级，[600][1000]（详见 readme）
 const fs = require('fs');
 
 const mode = 1; // 1 维护 2 保护 3 调试（详见 readme）
@@ -205,22 +206,25 @@ function maintain() {
   }
   if (wsList.length == 0) return;
   const blocksize = 25; // 块长
-  for (let i = 0; i < blocksize; ++i) {
-    for (let k = 0; k < W; ++k) {
-      for (let j = i; j < H; j += blocksize) {
-        // 分块维护（详见 readme）
-        if (!coloreq(board[j][k], Data[j][k])) {
-          if (justt[j][k]) {
-            justt[j][k] = 0;
-          } else {
-            if (mode == 3) {
-              console.log("Find difference: (%d,%d)", k, j);
+  for (let p = 1; p <= 10; ++p) {
+    for (let i = 0; i < blocksize; ++i) {
+      for (let k = 0; k < W; ++k) {
+        for (let j = i; j < H; j += blocksize) {
+          // 分块维护（详见 readme）
+          if (Prior[j][k] != p) continue;
+          if (!coloreq(board[j][k], Data[j][k])) {
+            if (justt[j][k]) {
+              justt[j][k] = 0;
+            } else {
+              if (mode == 3) {
+                console.log("Find difference: (%d,%d)", k, j);
+              }
+              mypush([j, k]);
             }
-            mypush([j, k]);
-          }
-          if (mqueue.length >= wsList.length) {
-            maintainq();
-            return;
+            if (mqueue.length >= wsList.length) {
+              maintainq();
+              return;
+            }
           }
         }
       }
@@ -229,7 +233,7 @@ function maintain() {
   maintainq();
 }
 
-async function change(ws, x, y, c) {
+function change(ws, x, y, c) {
   if (!allOk) {
     return;
   }
